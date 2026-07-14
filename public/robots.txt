@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://students-table-react-kappa.vercel.app/sitemap.xml
