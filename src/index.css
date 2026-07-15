@@ -62,3 +62,10 @@ background:#27ae60;
 color:white;
 border:none;
 }
+
+.cancelBtn{
+background:#7f8c8d;
+color:white;
+border:none;
+margin-left:5px;
+}

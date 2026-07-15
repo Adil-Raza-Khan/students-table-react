@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function StudentForm({ addStudent, updateStudent, editingStudent }) {
+function StudentForm({ addStudent, updateStudent, editingStudent, setEditingStudent }) {
 
   const [formData, setFormData] = useState({
     name: "",
@@ -9,17 +9,19 @@ function StudentForm({ addStudent, updateStudent, editingStudent }) {
   });
 
   useEffect(() => {
-
     if (editingStudent) {
       setFormData(editingStudent);
+    } else {
+      setFormData({
+        name: "",
+        email: "",
+        age: ""
+      });
     }
-
   }, [editingStudent]);
 
   const handleChange = (e) => {
-
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value
@@ -27,15 +29,23 @@ function StudentForm({ addStudent, updateStudent, editingStudent }) {
   };
 
   const validate = () => {
+    const nameTrimmed = formData.name.trim();
+    const emailTrimmed = formData.email.trim();
+    const ageVal = formData.age;
 
-    if (!formData.name || !formData.email || !formData.age) {
+    if (!nameTrimmed || !emailTrimmed || ageVal === "") {
       alert("All fields are required");
       return false;
     }
 
-    const emailPattern = /\S+@\S+\.\S+/;
+    const parsedAge = parseInt(ageVal, 10);
+    if (isNaN(parsedAge) || parsedAge <= 0 || parsedAge > 120) {
+      alert("Please enter a valid age between 1 and 120");
+      return false;
+    }
 
-    if (!emailPattern.test(formData.email)) {
+    const emailPattern = /\S+@\S+\.\S+/;
+    if (!emailPattern.test(emailTrimmed)) {
       alert("Invalid email format");
       return false;
     }
@@ -44,15 +54,21 @@ function StudentForm({ addStudent, updateStudent, editingStudent }) {
   };
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
 
     if (!validate()) return;
 
+    const finalData = {
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      age: parseInt(formData.age, 10)
+    };
+
     if (editingStudent) {
-      updateStudent(formData);
+      updateStudent(finalData);
     } else {
-      addStudent(formData);
+      addStudent(finalData);
     }
 
     setFormData({
@@ -60,13 +76,10 @@ function StudentForm({ addStudent, updateStudent, editingStudent }) {
       email: "",
       age: ""
     });
-
   };
 
   return (
-
     <form className="form" onSubmit={handleSubmit}>
-
       <input
         type="text"
         name="name"
@@ -95,6 +108,15 @@ function StudentForm({ addStudent, updateStudent, editingStudent }) {
         {editingStudent ? "Update Student" : "Add Student"}
       </button>
 
+      {editingStudent && (
+        <button
+          type="button"
+          className="cancelBtn"
+          onClick={() => setEditingStudent(null)}
+        >
+          Cancel
+        </button>
+      )}
     </form>
   );
 }

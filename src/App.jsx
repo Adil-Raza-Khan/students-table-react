@@ -10,21 +10,30 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
-    // simulate loading
-    setTimeout(() => {
-
-      const initialData = [
-        { id: 1, name: "Adil Khan", email: "adil@gmail.com", age: 22 },
-        { id: 2, name: "Rahul Sharma", email: "rahul@gmail.com", age: 21 }
-      ];
-
-      setStudents(initialData);
+    // simulate loading from localStorage or fallback
+    const timer = setTimeout(() => {
+      const savedStudents = localStorage.getItem("students");
+      if (savedStudents) {
+        setStudents(JSON.parse(savedStudents));
+      } else {
+        const initialData = [
+          { id: 1, name: "Adil Khan", email: "adil@gmail.com", age: 22 },
+          { id: 2, name: "Rahul Sharma", email: "rahul@gmail.com", age: 21 }
+        ];
+        setStudents(initialData);
+        localStorage.setItem("students", JSON.stringify(initialData));
+      }
       setLoading(false);
-
     }, 1000);
 
+    return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem("students", JSON.stringify(students));
+    }
+  }, [students, loading]);
 
   const addStudent = (student) => {
 
@@ -71,6 +80,7 @@ function App() {
         addStudent={addStudent}
         updateStudent={updateStudent}
         editingStudent={editingStudent}
+        setEditingStudent={setEditingStudent}
       />
 
       <button
